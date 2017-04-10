@@ -23,6 +23,15 @@ public class RegisterActivity extends AppCompatActivity {
         eMail = (EditText) findViewById(R.id.email);
         password = (EditText) findViewById(R.id.password);
 
+        login = (TextView) findViewById(R.id.login);
+
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity( new Intent(RegisterActivity.this, LoginActivity.class));
+            }
+        });
+
         register = (Button) findViewById(R.id.registerButton);
 
         register.setOnClickListener(new View.OnClickListener() {
@@ -32,6 +41,14 @@ public class RegisterActivity extends AppCompatActivity {
                 if(username.getText().toString().equals(""))
                 {
                     username.setError("Can't be empty!");
+                }
+                else if(!username.getText().toString().matches("[A-Za-z0-9]+"))
+                {
+                    username.setError("Only letters and number allowed!");
+                }
+                else if(username.getText().toString().length() < 5)
+                {
+                    username.setError("Need to be longer than 5 characters");
                 }
                 else if(eMail.getText().toString().equals(""))
                 {
