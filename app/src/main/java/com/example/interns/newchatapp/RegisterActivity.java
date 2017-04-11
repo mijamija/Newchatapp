@@ -1,23 +1,38 @@
 package com.example.interns.newchatapp;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+
 
 public class RegisterActivity extends AppCompatActivity {
 
     EditText username, eMail, password;
     Button register;
     TextView login;
+    ProgressDialog progressDialog;
+    FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+
+        firebaseAuth = FirebaseAuth.getInstance();
 
         username = (EditText) findViewById(R.id.username);
         eMail = (EditText) findViewById(R.id.email);
@@ -60,10 +75,39 @@ public class RegisterActivity extends AppCompatActivity {
                 }
                 else
                 {
-                    startActivity( new Intent(RegisterActivity.this, ChatUsers.class));
+                    registerUser();
                 }
 
             }
         });
     }
+
+    public void registerUser()
+    {
+
+        String email = eMail.getText().toString();
+        String pass = password.getText().toString();
+
+        progressDialog = new ProgressDialog(RegisterActivity.this);
+        progressDialog.setMessage("Registering user... please wait");
+        progressDialog.show();
+
+        firebaseAuth.createUserWithEmailAndPassword(email, pass)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        //checking if success
+                        if(task.isSuccessful()){
+                            finish();
+                            startActivity(new Intent(getApplicationContext(), ChatUsers.class));
+                        }else{
+                            //display some message here
+                            Toast.makeText(RegisterActivity.this,"Registration Error",Toast.LENGTH_LONG).show();
+                        }
+                        progressDialog.dismiss();
+                    }
+                });
+
+    }
+
 }
