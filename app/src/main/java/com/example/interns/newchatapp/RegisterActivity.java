@@ -17,6 +17,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 
 public class RegisterActivity extends AppCompatActivity {
@@ -26,6 +28,7 @@ public class RegisterActivity extends AppCompatActivity {
     TextView login;
     ProgressDialog progressDialog;
     FirebaseAuth firebaseAuth;
+    DatabaseReference databaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +36,8 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
 
         firebaseAuth = FirebaseAuth.getInstance();
+
+        databaseReference = FirebaseDatabase.getInstance().getReference();
 
         username = (EditText) findViewById(R.id.username);
         eMail = (EditText) findViewById(R.id.email);
@@ -88,6 +93,8 @@ public class RegisterActivity extends AppCompatActivity {
         String email = eMail.getText().toString();
         String pass = password.getText().toString();
 
+        User newUser = new User(username.getText().toString(), email, pass);
+
         progressDialog = new ProgressDialog(RegisterActivity.this);
         progressDialog.setMessage("Registering user... please wait");
         progressDialog.show();
@@ -98,6 +105,7 @@ public class RegisterActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         //checking if success
                         if(task.isSuccessful()){
+
                             finish();
                             startActivity(new Intent(getApplicationContext(), ChatUsers.class));
                         }else{
