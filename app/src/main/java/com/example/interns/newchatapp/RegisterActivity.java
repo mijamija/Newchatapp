@@ -17,6 +17,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -93,7 +94,7 @@ public class RegisterActivity extends AppCompatActivity {
         String email = eMail.getText().toString();
         String pass = password.getText().toString();
 
-        User newUser = new User(username.getText().toString(), email, pass);
+        final User newUser = new User(username.getText().toString(), email);
 
         progressDialog = new ProgressDialog(RegisterActivity.this);
         progressDialog.setMessage("Registering user... please wait");
@@ -105,6 +106,10 @@ public class RegisterActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         //checking if success
                         if(task.isSuccessful()){
+
+                            FirebaseUser user = firebaseAuth.getCurrentUser();
+
+                            databaseReference.child("users").child(user.getUid()).setValue(newUser);
 
                             finish();
                             startActivity(new Intent(getApplicationContext(), ChatUsers.class));
