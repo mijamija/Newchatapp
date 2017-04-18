@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -20,9 +22,11 @@ import java.util.ArrayList;
 public class ChatUsers extends AppCompatActivity {
 
     ListView list;
-    ArrayList<User> listOfUsers;
+    ArrayList<String> userList, listViewList;
     ArrayAdapter<String> adapter;
     DatabaseReference databaseReference;
+    EditText usernameSearch;
+    Button add;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,17 +35,35 @@ public class ChatUsers extends AppCompatActivity {
 
         databaseReference = FirebaseDatabase.getInstance().getReference().child("users");
 
-        listOfUsers = new ArrayList<>();
+        add = (Button) findViewById(R.id.addButton);
+
+        usernameSearch = (EditText) findViewById(R.id.usernameSearch);
+
+        userList = new ArrayList<>();
+        listViewList = new ArrayList<>();
 
         list = (ListView) findViewById(R.id.listView);
 
-
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        add.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onClick(View v) {
+                String username = usernameSearch.getText().toString();
+                boolean flag = false;
 
-                startActivity(new Intent(ChatUsers.this, ChatRoom.class));
-
+                for(String temp : userList)
+                {
+                    if(temp.equals(username)) {
+                        listViewList.add(temp);
+                        makeUserList();
+                        usernameSearch.setText("");
+                        flag = true;
+                    }
+                }
+                if(!flag)
+                {
+                    Toast.makeText(ChatUsers.this, "User not found...", Toast.LENGTH_SHORT).show();
+                    usernameSearch.setText("");
+                }
             }
         });
 
@@ -50,15 +72,33 @@ public class ChatUsers extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                for(DataSnapshot shot : dataSnapshot.getChildren())
-                {
-                    listOfUsers.add(shot.getValue(User.class));
-                }
+                    for( DataSnapshot ds : dataSnapshot.getChildren())
+                    {
+                        userList.add(ds.getValue(User.class).getUserName());
+                    }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Toast.makeText(ChatUsers.this, "Error", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+    public void makeUserList()
+    {
+
+        adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, listViewList);
+
+        list.setAdapter(adapter);
+
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                startActivity(new Intent(ChatUsers.this, ChatRoom.class));
+
             }
         });
 

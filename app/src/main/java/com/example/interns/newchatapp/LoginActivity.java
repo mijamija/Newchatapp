@@ -23,7 +23,6 @@ public class LoginActivity extends AppCompatActivity {
     TextView register;
     FirebaseAuth firebaseAuth;
     ProgressDialog progressDialog;
-    boolean state;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
