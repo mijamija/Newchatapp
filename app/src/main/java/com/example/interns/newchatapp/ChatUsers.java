@@ -22,7 +22,7 @@ import java.util.ArrayList;
 public class ChatUsers extends AppCompatActivity {
 
     ListView list;
-    ArrayList<String> userList, listViewList;
+    ArrayList<String> userList, listViewList, listOfIDs;
     ArrayAdapter<String> adapter;
     DatabaseReference databaseReference;
     EditText usernameSearch;
@@ -41,6 +41,7 @@ public class ChatUsers extends AppCompatActivity {
 
         userList = new ArrayList<>();
         listViewList = new ArrayList<>();
+        listOfIDs = new ArrayList<>();
 
         list = (ListView) findViewById(R.id.listView);
 
@@ -75,6 +76,7 @@ public class ChatUsers extends AppCompatActivity {
                     for( DataSnapshot ds : dataSnapshot.getChildren())
                     {
                         userList.add(ds.getValue(User.class).getUserName());
+                        listOfIDs.add(ds.getKey());
                     }
             }
 
@@ -97,7 +99,20 @@ public class ChatUsers extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                startActivity(new Intent(ChatUsers.this, ChatRoom.class));
+                int index = 0;
+
+                for(String s : userList)
+                {
+                    if(!s.equals(listViewList.get(position)))
+                        index++;
+                    else
+                        break;
+                }
+
+                Intent intent = new Intent(ChatUsers.this, ChatRoom.class);
+                intent.putExtra("chatName", listViewList.get(position));
+                intent.putExtra("ID", listOfIDs.get(index));
+                startActivity(intent);
 
             }
         });
