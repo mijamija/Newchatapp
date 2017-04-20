@@ -11,6 +11,8 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -22,28 +24,54 @@ import java.util.ArrayList;
 public class ChatUsers extends AppCompatActivity {
 
     ListView list;
-    ArrayList<String> userList, listViewList, listOfIDs;
+    ArrayList<String> userList, listViewList, listOfIDs, listOfFriendIDs;
     ArrayAdapter<String> adapter;
     DatabaseReference databaseReference;
     EditText usernameSearch;
     Button add;
+    FirebaseAuth firebaseAuth;
+    FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_users);
 
-        databaseReference = FirebaseDatabase.getInstance().getReference().child("users");
+        databaseReference = FirebaseDatabase.getInstance().getReference();
 
         add = (Button) findViewById(R.id.addButton);
 
         usernameSearch = (EditText) findViewById(R.id.usernameSearch);
 
+        firebaseAuth = FirebaseAuth.getInstance();
+
+        user = firebaseAuth.getCurrentUser();
+
+        listOfFriendIDs = new ArrayList<>();
         userList = new ArrayList<>();
         listViewList = new ArrayList<>();
         listOfIDs = new ArrayList<>();
 
         list = (ListView) findViewById(R.id.listView);
+
+        databaseReference.child("users").addValueEventListener( new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                    for( DataSnapshot ds : dataSnapshot.getChildren())
+                    {
+                        userList.add(ds.getValue(User.class).getUserName());
+                        listOfIDs.add(ds.getKey());
+                    }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(ChatUsers.this, "Error", Toast.LENGTH_SHORT).show();
+            }
+        });
+
 
         add.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,16 +96,20 @@ public class ChatUsers extends AppCompatActivity {
             }
         });
 
-        databaseReference.addValueEventListener( new ValueEventListener()
-        {
+        addAllFriends();
+        makeUserList();
+
+    }
+
+    public void addAllFriends()
+    {
+        databaseReference.child("user-messages").child(user.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-
-                    for( DataSnapshot ds : dataSnapshot.getChildren())
-                    {
-                        userList.add(ds.getValue(User.class).getUserName());
-                        listOfIDs.add(ds.getKey());
-                    }
+                for( DataSnapshot ds : dataSnapshot.getChildren())
+                {
+                    listOfFriendIDs.add(ds.getKey());
+                }
             }
 
             @Override
@@ -86,6 +118,7 @@ public class ChatUsers extends AppCompatActivity {
             }
         });
 
+        
     }
 
     public void makeUserList()
