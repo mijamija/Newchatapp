@@ -29,6 +29,7 @@ public class ChatRoom extends AppCompatActivity {
     FirebaseUser user;
     FirebaseAuth firebaseAuth;
     TextView text;
+    ScrollView scrollView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +40,14 @@ public class ChatRoom extends AppCompatActivity {
         sendButton = (Button) findViewById(R.id.sendButton);
         space = (LinearLayout) findViewById(R.id.space);
         text = (TextView) findViewById(R.id.text);
+        scrollView = (ScrollView) findViewById(R.id.scrollView);
+
+        scrollView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+            }
+        },1000);
 
         firebaseAuth = FirebaseAuth.getInstance();
 
@@ -70,6 +79,14 @@ public class ChatRoom extends AppCompatActivity {
 
                     databaseReference.child("messages").child(myID).setValue(info);
                     databaseReference.child("user-messages").child(user.getUid()).child(i.getStringExtra("ID")).child(myID).setValue(1);
+
+
+                    scrollView.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+                        }
+                    },1000);
 
                 }
             }
@@ -122,7 +139,7 @@ public class ChatRoom extends AppCompatActivity {
         textView.setTextSize(17);
         textView.setText(sender + message);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(0, 0, 0, 10);
+        lp.setMargins(0, 0, 100, 30);
         textView.setLayoutParams(lp);
 
         if(type == 1) {
@@ -130,6 +147,7 @@ public class ChatRoom extends AppCompatActivity {
         }
         else{
             textView.setBackgroundResource(R.drawable.rounded_corner2);
+            lp.setMargins(100, 0, 0, 30);
         }
 
         space.addView(textView);
