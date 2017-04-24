@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -18,18 +19,20 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class ChatRoom extends AppCompatActivity {
 
     EditText message;
     Button sendButton;
     LinearLayout space;
-    String otherPerson;
+    String otherPerson, otherPersonID;
     DatabaseReference databaseReference;
     FirebaseUser user;
     FirebaseAuth firebaseAuth;
     TextView text;
     ScrollView scrollView;
+    MessageInfo info;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,29 +60,29 @@ public class ChatRoom extends AppCompatActivity {
 
         Intent intent = getIntent();
         otherPerson = intent.getStringExtra("chatName");
+        otherPersonID = intent.getStringExtra("ID");
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(!message.getText().toString().equals(""))
                 {
-                    Intent i = getIntent();
-                    MessageInfo info = new MessageInfo();
+                    info = new MessageInfo();
                     long temp = System.currentTimeMillis();
                     String string = Long.toString(temp);
 
                     info.setMessage(message.getText().toString());
                     info.setTime(string);
                     info.setFromID(user.getUid());
-                    info.setToID(i.getStringExtra("ID"));
+                    info.setToID(otherPersonID);
 
                     String myID = databaseReference.child("messages").push().getKey();
 
                     message.setText("");
 
                     databaseReference.child("messages").child(myID).setValue(info);
-                    databaseReference.child("user-messages").child(user.getUid()).child(i.getStringExtra("ID")).child(myID).setValue(1);
-
+                    databaseReference.child("user-messages").child(user.getUid()).child(otherPersonID).child(myID).setValue(1);
+                    databaseReference.child("user-messages").child(otherPersonID).child(user.getUid()).child(myID).setValue(1);
 
                     scrollView.postDelayed(new Runnable() {
                         @Override
@@ -92,20 +95,13 @@ public class ChatRoom extends AppCompatActivity {
             }
         });
 
-        databaseReference.child("messages").addChildEventListener(new ChildEventListener() {
+        databaseReference.child("user-messages").child(user.getUid()).child(otherPersonID).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
-                MessageInfo newInfo = dataSnapshot.getValue(MessageInfo.class);
+                String childKey = dataSnapshot.getKey();
 
-                if(newInfo.getFromID().equals(user.getUid()))
-                {
-                    setMessageBox("You: \n",newInfo.getMessage(), 1);
-                }
-                else
-                {
-                    setMessageBox(otherPerson + ": \n",newInfo.getMessage(),2);
-                }
+                getMessageText(childKey);
 
             }
 
@@ -129,6 +125,36 @@ public class ChatRoom extends AppCompatActivity {
 
             }
         });
+    }
+
+    public void getMessageText(final String s)
+    {
+        databaseReference.child("messages").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                MessageInfo newInfo;
+
+                for(DataSnapshot ds : dataSnapshot.getChildren()) {
+                    if (ds.getKey().equals(s)) {
+                        newInfo = ds.getValue(MessageInfo.class);
+
+                        if (newInfo.getFromID().equals(user.getUid())) {
+                            setMessageBox("You: \n", newInfo.getMessage(), 1);
+                        } else {
+                            setMessageBox(otherPerson + ": \n", newInfo.getMessage(), 2);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                    Toast.makeText(ChatRoom.this, "Error geting messages...", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
     }
 
     public void setMessageBox(String sender, String message, int type)

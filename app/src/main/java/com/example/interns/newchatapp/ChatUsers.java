@@ -1,5 +1,6 @@
 package com.example.interns.newchatapp;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -34,6 +35,7 @@ public class ChatUsers extends AppCompatActivity {
 //    Button add;
     FirebaseAuth firebaseAuth;
     FirebaseUser user;
+    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,11 +81,27 @@ public class ChatUsers extends AppCompatActivity {
 //        });
 
       new BuildFriendList().execute();
+
+
+        adapter = new ArrayAdapter(ChatUsers.this, android.R.layout.simple_list_item_1, userList);
+
+        list.setAdapter(adapter);
+
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Intent intent = new Intent(ChatUsers.this, ChatRoom.class);
+                intent.putExtra("chatName", userList.get(position));
+                intent.putExtra("ID", listOfIDs.get(position));
+                startActivity(intent);
+
+            }
+        });
     }
 
     private class BuildFriendList extends AsyncTask<String, Void, String>
     {
-
         @Override
         protected String doInBackground(String... params) {
 
@@ -126,31 +144,18 @@ public class ChatUsers extends AppCompatActivity {
         }
 
         @Override
+        protected void onPreExecute() {
+
+            progressDialog = new ProgressDialog(ChatUsers.this);
+            progressDialog.setMessage("Uploading users... plase wait...");
+            progressDialog.show();
+        }
+
+        @Override
         protected void onPostExecute(String s) {
-            makeUserList();
+            progressDialog.dismiss();
         }
 
     }
 
-
-    public void makeUserList()
-    {
-
-        adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, userList);
-
-        list.setAdapter(adapter);
-
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                Intent intent = new Intent(ChatUsers.this, ChatRoom.class);
-                intent.putExtra("chatName", userList.get(position));
-                intent.putExtra("ID", listOfIDs.get(position));
-                startActivity(intent);
-
-            }
-        });
-
-    }
 }
