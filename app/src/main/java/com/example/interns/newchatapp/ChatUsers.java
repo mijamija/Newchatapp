@@ -28,14 +28,11 @@ import java.util.Map;
 public class ChatUsers extends AppCompatActivity {
 
     ListView list;
-    ArrayList<String> userList,  listOfIDs;
-   ArrayAdapter<String> adapter;
+    ArrayList<String> userList,  listOfIDs, listOfFriends, listViewList;
+    ArrayAdapter<String> adapter;
     DatabaseReference databaseReference;
-//    EditText usernameSearch;
-//    Button add;
     FirebaseAuth firebaseAuth;
     FirebaseUser user;
-    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,10 +40,6 @@ public class ChatUsers extends AppCompatActivity {
         setContentView(R.layout.activity_chat_users);
 
         databaseReference = FirebaseDatabase.getInstance().getReference();
-
-        //add = (Button) findViewById(R.id.addButton);
-
-        //usernameSearch = (EditText) findViewById(R.id.usernameSearch);
 
         firebaseAuth = FirebaseAuth.getInstance();
 
@@ -56,36 +49,32 @@ public class ChatUsers extends AppCompatActivity {
         listOfIDs = new ArrayList<>();
 
         list = (ListView) findViewById(R.id.listView);
-//
-//        add.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                String username = usernameSearch.getText().toString();
-//                boolean flag = false;
-//
-//                for(String temp : userList)
-//                {
-//                    if(temp.equals(username)) {
-//                        listViewList.add(temp);
-//                        makeUserList();
-//                        usernameSearch.setText("");
-//                        flag = true;
-//                    }
-//                }
-//                if(!flag)
-//                {
-//                    Toast.makeText(ChatUsers.this, "User not found...", Toast.LENGTH_SHORT).show();
-//                    usernameSearch.setText("");
-//                }
-//            }
-//        });
 
-      new BuildFriendList().execute();
-
-
-        adapter = new ArrayAdapter(ChatUsers.this, android.R.layout.simple_list_item_1, userList);
+        adapter = new ArrayAdapter(ChatUsers.this, android.R.layout.simple_list_item_1, listViewList);
 
         list.setAdapter(adapter);
+
+        databaseReference.child("users").addValueEventListener( new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for( DataSnapshot ds : dataSnapshot.getChildren())
+                {
+                    if(!ds.getKey().equals(user.getUid())) {
+                        userList.add(ds.getValue(User.class).getUserName());
+                        listOfIDs.add(ds.getKey());
+                   }
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(ChatUsers.this, "Error", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -98,64 +87,8 @@ public class ChatUsers extends AppCompatActivity {
 
             }
         });
-    }
-
-    private class BuildFriendList extends AsyncTask<String, Void, String>
-    {
-        @Override
-        protected String doInBackground(String... params) {
-
-            databaseReference.child("users").addValueEventListener( new ValueEventListener()
-            {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-
-                    for( DataSnapshot ds : dataSnapshot.getChildren())
-                    {
-                        if(!ds.getKey().equals(user.getUid())) {
-                            userList.add(ds.getValue(User.class).getUserName());
-                            listOfIDs.add(ds.getKey());
-                        }
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    Toast.makeText(ChatUsers.this, "Error", Toast.LENGTH_SHORT).show();
-                }
-            });
-
-//            databaseReference.child("user-messages").child(user.getUid()).addValueEventListener(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(DataSnapshot dataSnapshot) {
-//                    for( DataSnapshot ds : dataSnapshot.getChildren())
-//                    {
-//                        listOfFriendIDs.add(ds.getKey());
-//                    }
-//                }
-//
-//                @Override
-//                public void onCancelled(DatabaseError databaseError) {
-//                    Toast.makeText(ChatUsers.this, "Error", Toast.LENGTH_SHORT).show();
-//                }
-//            });
-
-            return null;
-        }
-
-        @Override
-        protected void onPreExecute() {
-
-            progressDialog = new ProgressDialog(ChatUsers.this);
-            progressDialog.setMessage("Uploading users... plase wait...");
-            progressDialog.show();
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            progressDialog.dismiss();
-        }
 
     }
+
 
 }
