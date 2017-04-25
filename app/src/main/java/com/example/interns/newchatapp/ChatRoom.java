@@ -71,18 +71,18 @@ public class ChatRoom extends AppCompatActivity {
                     long temp = System.currentTimeMillis();
                     String string = Long.toString(temp);
 
-                    info.setMessage(message.getText().toString());
-                    info.setTime(string);
-                    info.setFromID(user.getUid());
-                    info.setToID(otherPersonID);
+                    info.setText(message.getText().toString());
+                    info.setTimestamp(string);
+                    info.setFromId(user.getUid());
+                    info.setTold(otherPersonID);
 
                     String myID = databaseReference.child("messages").push().getKey();
 
                     message.setText("");
 
                     databaseReference.child("messages").child(myID).setValue(info);
-                    databaseReference.child("user-messages").child(user.getUid()).child(otherPersonID).child(myID).setValue(1);
-                    databaseReference.child("user-messages").child(otherPersonID).child(user.getUid()).child(myID).setValue(1);
+                    databaseReference.child("user-messages").child(user.getUid()).child(otherPersonID).child(myID).setValue("1");
+                    databaseReference.child("user-messages").child(otherPersonID).child(user.getUid()).child(myID).setValue("1");
 
                     scrollView.postDelayed(new Runnable() {
                         @Override
@@ -139,10 +139,10 @@ public class ChatRoom extends AppCompatActivity {
                     if (ds.getKey().equals(s)) {
                         newInfo = ds.getValue(MessageInfo.class);
 
-                        if (newInfo.getFromID().equals(user.getUid())) {
-                            setMessageBox("You: \n", newInfo.getMessage(), 1);
+                        if (newInfo.getFromId().equals(user.getUid())) {
+                            setMessageBox("You: \n", newInfo.getText(), 1);
                         } else {
-                            setMessageBox(otherPerson + ": \n", newInfo.getMessage(), 2);
+                            setMessageBox(otherPerson + ": \n", newInfo.getText(), 2);
                         }
                     }
                 }

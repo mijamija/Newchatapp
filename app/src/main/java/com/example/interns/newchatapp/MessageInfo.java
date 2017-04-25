@@ -6,40 +6,40 @@ package com.example.interns.newchatapp;
 
 public class MessageInfo {
 
-    private String message;
-    private String fromID;
-    private String toID;
-    private String time;
+    private String text;
+    private String fromId;
+    private String told;
+    private String timestamp;
 
-    public String getMessage() {
-        return message;
+    public String getText() {
+        return text;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setText(String text) {
+        this.text = text;
     }
 
-    public String getFromID() {
-        return fromID;
+    public String getFromId() {
+        return fromId;
     }
 
-    public void setFromID(String fromID) {
-        this.fromID = fromID;
+    public void setFromId(String fromId) {
+        this.fromId = fromId;
     }
 
-    public String getToID() {
-        return toID;
+    public String getTold() {
+        return told;
     }
 
-    public void setToID(String toID) {
-        this.toID = toID;
+    public void setTold(String told) {
+        this.told = told;
     }
 
-    public String getTime() {
-        return time;
+    public String getTimestamp() {
+        return timestamp;
     }
 
-    public void setTime(String time) {
-        this.time = time;
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
     }
 }

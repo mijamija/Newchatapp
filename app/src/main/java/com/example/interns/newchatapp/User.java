@@ -8,37 +8,31 @@ import java.util.ArrayList;
 
 public class User {
 
-    private String userName;
-    private String eMail;
-    private ArrayList<String> chatBuddies;
+    private String name;
+    private String email;
 
     public User()
     {
     }
 
     public User(String userName, String eMail) {
-        this.userName = userName;
-        this.eMail = eMail;
+        this.name = userName;
+        this.email = eMail;
     }
 
-    public void setChatBuddies(ArrayList<String> chatBuddies) { this.chatBuddies = chatBuddies; }
-
-    public ArrayList<String> getChatBuddies() { return chatBuddies; }
-
-    public String geteMail() {
-        return eMail;
+    public String getName() {
+        return name;
     }
 
-    public void seteMail(String eMail) {
-        this.eMail = eMail;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setEmail(String email) {
+        this.email = email;
     }
-
 }
