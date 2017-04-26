@@ -8,7 +8,7 @@ public class MessageInfo {
 
     private String text;
     private String fromId;
-    private String told;
+    private String toId;
     private String timestamp;
 
     public String getText() {
@@ -27,12 +27,12 @@ public class MessageInfo {
         this.fromId = fromId;
     }
 
-    public String getTold() {
-        return told;
+    public String getToId() {
+        return toId;
     }
 
-    public void setTold(String told) {
-        this.told = told;
+    public void setToId(String toId) {
+        this.toId = toId;
     }
 
     public String getTimestamp() {

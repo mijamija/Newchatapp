@@ -74,7 +74,7 @@ public class ChatRoom extends AppCompatActivity {
                     info.setText(message.getText().toString());
                     info.setTimestamp(string);
                     info.setFromId(user.getUid());
-                    info.setTold(otherPersonID);
+                    info.setToId(otherPersonID);
 
                     String myID = databaseReference.child("messages").push().getKey();
 

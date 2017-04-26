@@ -83,6 +83,7 @@ public class ChatUsers extends AppCompatActivity {
         databaseReference.child("users").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
                 userList.add(dataSnapshot.getValue(User.class).getName());
                 listOfIDs.add(dataSnapshot.getKey());
 

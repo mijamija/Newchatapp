@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,6 +16,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.squareup.picasso.Picasso;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -23,11 +25,15 @@ public class LoginActivity extends AppCompatActivity {
     TextView register;
     FirebaseAuth firebaseAuth;
     ProgressDialog progressDialog;
+    ImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        imageView = (ImageView) findViewById(R.id.imageView);
+        Picasso.with(this).load("https://s-media-cache-ak0.pinimg.com/736x/cb/eb/46/cbeb46a7bcde12bea4ff0e7f06b70a03.jpg").into(imageView);
 
         user = (EditText) findViewById(R.id.user);
         password = (EditText) findViewById(R.id.password);
